@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-group = "io.github.wezzen.maybe"
+group = "io.github.wezzen"
 version = "0.1.0"
 
 repositories {
