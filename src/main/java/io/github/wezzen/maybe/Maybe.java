@@ -84,6 +84,10 @@ public final class Maybe<T> {
     /**
      * Creates a {@code Maybe} from a nullable value.
      * Returns a present {@code Maybe} if value is non-null, empty otherwise.
+     *
+     * @param <T>   the type of the value
+     * @param value the nullable value
+     * @return a present {@code Maybe} if value is non-null, empty otherwise
      */
     public static <T> @NotNull Maybe<T> of(@Nullable final T value) {
         return Objects.nonNull(value) ? new Maybe<>(value) : empty();
@@ -93,6 +97,9 @@ public final class Maybe<T> {
      * Creates a {@code Maybe} from a guaranteed non-null value.
      * Use this when you are certain the value is non-null — throws immediately if not.
      *
+     * @param <T>   the type of the value
+     * @param value the non-null value
+     * @return a present {@code Maybe} if value is non-null, empty otherwise
      * @throws NullPointerException if value is null — use {@link #of} for nullable values
      */
     public static <T> @NotNull Maybe<T> require(@NotNull final T value) {
@@ -103,6 +110,9 @@ public final class Maybe<T> {
 
     /**
      * Returns the singleton empty {@code Maybe}.
+     *
+     * @param <T> the type of the absent value
+     * @return the singleton empty {@code Maybe}
      */
     @SuppressWarnings("unchecked")
     public static <T> @NotNull Maybe<T> empty() {
@@ -122,6 +132,7 @@ public final class Maybe<T> {
      * );
      * }</pre>
      *
+     * @param <R>       the type of the result
      * @param ifPresent function applied to the value if present
      * @param ifEmpty   supplier called if absent
      * @return result of whichever function was applied
@@ -174,6 +185,9 @@ public final class Maybe<T> {
      *
      * <p>Note: {@code fallback} is always evaluated regardless of whether
      * the value is present — use {@link #orElseGet} to avoid unnecessary evaluation.
+     *
+     * @param fallback the non-null value to return if absent
+     * @return the value if present, otherwise {@code fallback}
      */
     public @NotNull T orElse(@NotNull final T fallback) {
         Objects.requireNonNull(fallback, "fallback must not be null");
@@ -183,6 +197,9 @@ public final class Maybe<T> {
     /**
      * Returns the value if present, otherwise the result of {@code fallback}.
      * The fallback is only called if the value is absent.
+     *
+     * @param fallback supplier called if absent, must not return null
+     * @return the value if present, otherwise the result of {@code fallback}
      */
     public @NotNull T orElseGet(@NotNull final Supplier<? extends T> fallback) {
         Objects.requireNonNull(fallback, "fallback must not be null");
@@ -196,6 +213,9 @@ public final class Maybe<T> {
     /**
      * Returns the value if present, otherwise throws the exception from {@code exceptionSupplier}.
      *
+     * @param <X>               the type of the exception to throw
+     * @param exceptionSupplier supplier providing the exception to throw if absent
+     * @return the value if present
      * @throws X if the value is absent
      */
     public <X extends Throwable> @NotNull T orElseThrow(
@@ -210,6 +230,8 @@ public final class Maybe<T> {
 
     /**
      * Returns {@code true} if a value is present.
+     *
+     * @return {@code true} if a value is present, {@code false} otherwise
      */
     public boolean isPresent() {
         return Objects.nonNull(value);
@@ -217,6 +239,8 @@ public final class Maybe<T> {
 
     /**
      * Returns {@code true} if no value is present.
+     *
+     * @return {@code true} if no value is present, {@code false} otherwise
      */
     public boolean isEmpty() {
         return Objects.isNull(value);
@@ -225,6 +249,10 @@ public final class Maybe<T> {
     /**
      * Applies {@code mapper} to the value if present, wrapping the result in a new {@code Maybe}.
      * If the mapper returns {@code null}, the result is an empty {@code Maybe}.
+     *
+     * @param <R>    the type of the result
+     * @param mapper function applied to the value if present
+     * @return a present {@code Maybe} with the mapped value, or empty if absent or mapper returned null
      */
     public <R> @NotNull Maybe<R> map(
             @NotNull final Function<? super T, ? extends @Nullable R> mapper
@@ -236,6 +264,10 @@ public final class Maybe<T> {
     /**
      * Applies {@code mapper} to the value if present, returning the resulting {@code Maybe}.
      * The mapper must not return {@code null} — return {@link #empty()} instead.
+     *
+     * @param <R>    the type of the result
+     * @param mapper function applied to the value if present, must not return null
+     * @return the {@code Maybe} returned by the mapper, or empty if absent
      */
     public <R> @NotNull Maybe<R> flatMap(
             @NotNull final Function<? super T, @NotNull Maybe<? extends R>> mapper
@@ -254,6 +286,9 @@ public final class Maybe<T> {
     /**
      * Returns this {@code Maybe} if the value is present and matches the predicate,
      * otherwise returns an empty {@code Maybe}.
+     *
+     * @param predicate the predicate to apply to the value if present
+     * @return this {@code Maybe} if present and predicate matches, otherwise empty
      */
     public @NotNull Maybe<T> filter(@NotNull final Predicate<? super T> predicate) {
         Objects.requireNonNull(predicate, "predicate must not be null");
@@ -265,6 +300,9 @@ public final class Maybe<T> {
 
     /**
      * Returns this {@code Maybe} if present, otherwise the result of {@code fallback}.
+     *
+     * @param fallback supplier providing a non-null {@code Maybe} if absent
+     * @return this {@code Maybe} if present, otherwise the result of {@code fallback}
      */
     public @NotNull Maybe<T> or(@NotNull final Supplier<@NotNull Maybe<T>> fallback) {
         Objects.requireNonNull(fallback, "fallback must not be null");
@@ -278,6 +316,8 @@ public final class Maybe<T> {
     /**
      * Executes {@code action} if a value is present. Does nothing if absent.
      * Prefer {@link #consume} when you also need to handle the empty case.
+     *
+     * @param action consumer called with the value if present
      */
     public void ifPresent(@NotNull final Consumer<? super T> action) {
         Objects.requireNonNull(action, "action must not be null");
@@ -288,6 +328,8 @@ public final class Maybe<T> {
 
     /**
      * Converts this {@code Maybe} to an {@link Optional}.
+     *
+     * @return an {@link Optional} containing the value if present, otherwise empty
      */
     public @NotNull Optional<T> toOptional() {
         return Optional.ofNullable(value);
@@ -296,6 +338,8 @@ public final class Maybe<T> {
     /**
      * Returns a {@link Stream} of the value if present, or an empty stream.
      * Useful for {@code list.stream().flatMap(x -> Maybe.of(x).stream())}.
+     *
+     * @return a {@link Stream} containing the value if present, otherwise empty
      */
     public @NotNull Stream<T> stream() {
         return isPresent() ? Stream.of(value) : Stream.empty();
@@ -309,6 +353,9 @@ public final class Maybe<T> {
      *     .map(this::parseId)
      *     .collect(Maybe.present());
      * }</pre>
+     *
+     * @param <T> the type of the values
+     * @return a {@link Collector} that collects only present values into a {@link List}
      */
     public static <T> Collector<Maybe<T>, ?, List<T>> present() {
         return Collectors.flatMapping(
@@ -325,6 +372,12 @@ public final class Maybe<T> {
      * <pre>{@code stream.flatMap(x -> Maybe.of(f(x)).stream())}</pre>
      * write:
      * <pre>{@code Maybe.mapPresent(stream, f)}</pre>
+     *
+     * @param <T>    the type of the input stream elements
+     * @param <R>    the type of the output values
+     * @param stream the input stream
+     * @param mapper function returning a non-null {@code Maybe} for each element
+     * @return a {@link Stream} containing only the present values
      */
     public static <T, R> @NotNull Stream<R> mapPresent(
             @NotNull final Stream<T> stream,
@@ -347,6 +400,10 @@ public final class Maybe<T> {
      * <pre>{@code stream.flatMap(Maybe::stream)}</pre>
      * write:
      * <pre>{@code Maybe.filterPresent(stream)}</pre>
+     *
+     * @param <T>    the type of the values
+     * @param stream the stream of {@code Maybe} to filter
+     * @return a {@link Stream} containing only the present values
      */
     public static <T> @NotNull Stream<T> filterPresent(@NotNull final Stream<Maybe<T>> stream) {
         Objects.requireNonNull(stream, "stream must not be null");
